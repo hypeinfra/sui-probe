@@ -13,7 +13,7 @@ import (
 const OfficialDevNode = "fullnode.devnet.sui.io"
 
 type NodeClient struct {
-	Address url.URL
+	Address string
 	Client  *http.Client
 	Header  *http.Header
 }
@@ -29,11 +29,7 @@ func (j *JSONRPCError) Error() string {
 
 func NewNode(address string) *NodeClient {
 	return &NodeClient{
-		Address: url.URL{
-			Scheme: "https",
-			Host:   address,
-			Path:   "/",
-		},
+		Address: address,
 		Client: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -53,9 +49,13 @@ func (n *NodeClient) GetTotalTransactionNumber() (int, error) {
 	message := bytes.NewBufferString(`{"jsonrpc": "2.0","method": "sui_getTotalTransactionNumber","id": 1}`)
 	values := &GetTotalTransactionNumberStruct{}
 	RPCError := &JSONRPCError{}
+	parsedURL, err := url.Parse(n.Address)
+	if err != nil {
+		return 0, err
+	}
 	do, err := n.Client.Do(&http.Request{
 		Method: "POST",
-		URL:    &n.Address,
+		URL:    parsedURL,
 		Header: *n.Header,
 		Body:   io.NopCloser(message),
 	})
