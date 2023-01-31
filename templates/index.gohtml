@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ template "head" . }}
+<body>
+<main>
+    <h1>Sui Node Healthcheck</h1>
+    <p>Want to check your sync status? You come to the right place.</p>
+    <form action="/" method="get">
+        <input type="text" name="sui-node-address" placeholder="Node IP with port. Example: 127.0.0.1:9000" aria-label="Your Sui Node IP with Port">
+        <input type="submit" hidden />
+    </form>
+</main>
+{{ template "footer" . }}
+</body>
