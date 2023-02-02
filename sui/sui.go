@@ -3,6 +3,7 @@ package sui
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -11,6 +12,7 @@ import (
 )
 
 const OfficialDevNode = "fullnode.devnet.sui.io"
+const OfficialTestNode = "fullnode.testnet.sui.io"
 
 type NodeClient struct {
 	Address string
@@ -46,12 +48,12 @@ type GetTotalTransactionNumberStruct struct {
 }
 
 func (n *NodeClient) GetTotalTransactionNumber() (int, error) {
-	message := bytes.NewBufferString(`{"jsonrpc": "2.0","method": "sui_getTotalTransactionNumber","id": 1}`)
+	message := bytes.NewBufferString(`{"jsonrpc": "2.0","method": "sui_getTotalTransactionNumber","id": 69}`)
 	values := &GetTotalTransactionNumberStruct{}
-	RPCError := &JSONRPCError{}
+	rpcError := &JSONRPCError{}
 	parsedURL, err := url.Parse(n.Address)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("could not parse node address: %w", err)
 	}
 	do, err := n.Client.Do(&http.Request{
 		Method: "POST",
@@ -60,18 +62,60 @@ func (n *NodeClient) GetTotalTransactionNumber() (int, error) {
 		Body:   io.NopCloser(message),
 	})
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("http request to the node failed: %w", err)
 	}
-	if do.StatusCode != http.StatusOK {
-		err = json.NewDecoder(do.Body).Decode(&RPCError)
-		if err != nil {
-			return 0, err
-		}
-		return 0, RPCError
-	}
-	err = json.NewDecoder(do.Body).Decode(values)
+
+	data, err := io.ReadAll(do.Body)
 	if err != nil {
-		return 0, err
+		panic(err)
+	}
+	buf := bytes.NewBuffer(data)
+
+	if do.StatusCode != http.StatusOK {
+		err = json.NewDecoder(buf).Decode(&rpcError)
+		if err != nil {
+			return 0, fmt.Errorf("error parsing failed, no RPC error was provided: %w. Response from the node: %q", err, buf)
+		}
+		return 0, rpcError
+	}
+	err = json.NewDecoder(buf).Decode(values)
+	if err != nil {
+		err = json.NewDecoder(buf).Decode(&rpcError)
+		if err != nil {
+			return 0, fmt.Errorf("node responded with OK HTTP status, but program failed to decode the response, no RPC error was provided: %w. Response from the node: %q", err, buf)
+		}
+		return 0, fmt.Errorf("node responded with OK HTTP status, but program failed to decode RPC response: %w. Response from the node: %q", err, buf)
 	}
 	return values.Result, nil
+}
+
+func (n *NodeClient) Discover() (json.RawMessage, error) {
+	message := bytes.NewBufferString(`{"jsonrpc":"2.0","method":"rpc.discover","id":69}`)
+	rpcError := &JSONRPCError{}
+	parsedURL, err := url.Parse(n.Address)
+	if err != nil {
+		return nil, err
+	}
+	do, err := n.Client.Do(&http.Request{
+		Method: "POST",
+		URL:    parsedURL,
+		Header: *n.Header,
+		Body:   io.NopCloser(message),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if do.StatusCode != http.StatusOK {
+		err = json.NewDecoder(do.Body).Decode(&rpcError)
+		if err != nil {
+			return nil, err
+		}
+		return nil, rpcError
+	}
+	var values json.RawMessage
+	err = json.NewDecoder(do.Body).Decode(&values)
+	if err != nil {
+		return nil, err
+	}
+	return values, nil
 }
