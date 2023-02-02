@@ -54,6 +54,18 @@ main form input {
     border-radius: 6px;
 }
 
+main form input {
+    border: 1px solid #ced4da;
+}
+
+main form + p {
+    padding: 1rem;
+    border: 1px solid #ea4646;
+    background: rgba(234, 70, 70, 0.44);
+    border-radius: 6px;
+    color: black;
+}
+
 main form input:focus {
     border: 1px solid rgb(111, 188, 240);
     outline: none;
@@ -65,10 +77,16 @@ main form input:focus {
         background-color: #181818;
         color: #fff;
     }
+
     a {
         color: #007bff;
     }
+
     main form input {
+        color: white;
+    }
+
+    main form + p {
         color: white;
     }
 }
