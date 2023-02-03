@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ template "head" . }}
+<body>
+<main>
+    <h1>Checking your node</h1>
+    <table>
+        <thead>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Official Node</td>
+            <td>Your Node</td>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Amount of node transactions</td>
+            <td>{{ .transactionsOfficial }}</td>
+            <td>{{ .transactions }}</td>
+        </tr>
+        <tr>
+            <td>Node version</td>
+            <td>{{ .versionOfficial }}</td>
+            <td>{{ .version }}</td>
+        </tr>
+        <tr>
+            <td>Amount of schemas</td>
+            <td>{{ .schemasAmountOfficial }}</td>
+            <td>{{ .schemasAmount }}</td>
+        </tr>
+        <tr>
+            <td>Amount of methods</td>
+            <td>{{ .methodsAmountOfficial }}</td>
+            <td>{{ .methodsAmount }}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <pre>
+        <code>
+            {{ .raw }}
+        </code>
+    </pre>
+</main>
+{{ template "footer" . }}
+</body>

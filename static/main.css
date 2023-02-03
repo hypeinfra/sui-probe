@@ -27,7 +27,7 @@ header {
     padding: 1rem;
 }
 
-main {
+main#main-page {
     position: absolute;
     top: 45%;
     left: 50%;
@@ -46,7 +46,7 @@ html {
     box-sizing: inherit;
 }
 
-main form input {
+main#main-page form input {
     border: 1px solid white;
     background: transparent;
     padding: 1rem;
@@ -54,11 +54,11 @@ main form input {
     border-radius: 6px;
 }
 
-main form input {
+main#main-page form input {
     border: 1px solid #ced4da;
 }
 
-main form + p {
+main#main-page form + p {
     padding: 1rem;
     border: 1px solid #ea4646;
     background: rgba(234, 70, 70, 0.44);
@@ -66,7 +66,7 @@ main form + p {
     color: black;
 }
 
-main form input:focus {
+main#main-page form input:focus {
     border: 1px solid rgb(111, 188, 240);
     outline: none;
 }
@@ -82,11 +82,11 @@ main form input:focus {
         color: #007bff;
     }
 
-    main form input {
+    main#main-page form input {
         color: white;
     }
 
-    main form + p {
+    main#main-page form + p {
         color: white;
     }
 }
