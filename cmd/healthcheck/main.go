@@ -12,6 +12,8 @@ import (
 	"sui/static"
 	"sui/sui"
 	"sui/templates"
+	"sync"
+	"time"
 )
 
 type Template struct {
@@ -71,7 +73,7 @@ func main() {
 			ipaddr, err := netip.ParseAddrPort(nodeIP)
 			if err != nil {
 				if err.Error() == "not an ip:port" {
-					return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "invalid userNode address, check the format is correct. For example: 127.0.0.1:9000", "ip": nodeIP})
+					return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Did you forgot to specify the port? Check the format is correct. For example: 127.0.0.1:9000", "ip": nodeIP})
 				}
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
@@ -95,6 +97,19 @@ func main() {
 			err = g.Wait()
 			if err != nil {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
+			}
+
+			c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
+			c.Response().WriteHeader(http.StatusProcessing)
+			writeLoadingMessageOnce := sync.Once{}
+			for i := 0; i < 5; i++ {
+				// Write to stream that we are loading info
+				writeLoadingMessageOnce.Do(func() {
+					_, _ = c.Response().Write([]byte("Loading node info"))
+				})
+				_, _ = c.Response().Write([]byte("."))
+				c.Response().Flush()
+				time.Sleep(1 * time.Second)
 			}
 
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
