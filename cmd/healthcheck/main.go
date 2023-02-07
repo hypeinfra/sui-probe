@@ -88,7 +88,7 @@ func main() {
 			g := new(errgroup.Group)
 
 			var (
-				officialNodeInfo, providedNodeInfo NodeInfo
+				officialNodeInfo, providedNodeInfo, providedNodeInfoWithSleep NodeInfo
 			)
 
 			g.Go(GatherNodeInfo(officialNode, &officialNodeInfo))
@@ -100,17 +100,39 @@ func main() {
 			}
 
 			c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
-			c.Response().WriteHeader(http.StatusProcessing)
 			writeLoadingMessageOnce := sync.Once{}
-			for i := 0; i < 5; i++ {
+			for i := 0; i < 4; i++ {
 				// Write to stream that we are loading info
 				writeLoadingMessageOnce.Do(func() {
-					_, _ = c.Response().Write([]byte("Loading node info"))
+					// <!DOCTYPE html>
+					// <html lang="en">
+					// <head>
+					//    <meta charset="UTF-8">
+					//    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+					//    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+					//    <link rel="stylesheet" href="/static/main.css">
+					//    <title>Project head</title>
+					// </head>
+					_, _ = c.Response().Write([]byte(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Project head</title>
+</head>
+<body>
+<div id="progress">Loading node info`))
 				})
 				_, _ = c.Response().Write([]byte("."))
 				c.Response().Flush()
 				time.Sleep(1 * time.Second)
 			}
+			_, _ = c.Response().Write([]byte("</div>"))
+			_, _ = c.Response().Write([]byte("<style>#progress { display: none; }</style>"))
+			c.Response().Flush()
+			g.Go(GatherNodeInfo(userNode, &providedNodeInfoWithSleep))
 
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
 				"ip":                    nodeIP,
