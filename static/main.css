@@ -46,6 +46,12 @@ html {
     box-sizing: inherit;
 }
 
+main#node {
+    margin: 0 auto;
+    max-width: 600px;
+    padding: 1rem;
+}
+
 main#main-page form input {
     border: 1px solid white;
     background: transparent;
@@ -56,6 +62,7 @@ main#main-page form input {
 
 main#main-page form input {
     border: 1px solid #ced4da;
+    box-shadow: 0 12px 30px 4px rgb(0 0 0 / 5%);
 }
 
 main#main-page form + p {
@@ -79,19 +86,20 @@ table, td, th {
 body > main > table {
     border-collapse: collapse;
     border: 1px solid black;
-    margin: 0 auto;
+    width: 100%;
 }
 
 /* Universal ones */
 .warning {
     position: relative;
     padding: 0.75rem 1.25rem;
-    margin-bottom: 1rem;
+    margin: 0 auto;
     border-radius: 0.25rem;
 
     color: #856404;
     background-color: #fff3cd;
     border-color: #ffeeba;
+
 }
 
 /* Dark theme */
@@ -111,5 +119,9 @@ body > main > table {
 
     main#main-page form + p {
         color: white;
+    }
+
+    main#main-page form input {
+        box-shadow: 0 12px 30px 4px rgb(0 0 0 / 20%);
     }
 }
