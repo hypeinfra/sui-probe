@@ -7,12 +7,16 @@ import (
 	"golang.org/x/sync/errgroup"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"net/netip"
+	"os"
+	"os/signal"
 	"sui/static"
 	"sui/sui"
 	"sui/templates"
 	"sync"
+	"syscall"
 	"time"
 )
 
@@ -71,14 +75,18 @@ func GatherNodeInfo(node *sui.NodeClient, result *NodeInfo) func() error {
 }
 
 func main() {
+	signalChannel := make(chan os.Signal, 2)
+	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
 
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Gzip())
+
 	t := template.Must(template.ParseFS(templates.Templates, "*.gohtml", "*/*.gohtml"))
 	e.Renderer = &Template{
 		t,
 	}
+
 	e.GET("/", func(c echo.Context) error {
 		nodeIP := c.QueryParam("sui-node-address")
 		if nodeIP != "" {
@@ -155,5 +163,22 @@ func main() {
 		return c.Render(http.StatusOK, "index.gohtml", nil)
 	})
 	e.StaticFS("/static", static.FS)
-	e.Logger.Fatal(e.Start(":1323"))
+
+	go func() {
+		sig := <-signalChannel
+		switch sig {
+		case os.Interrupt, syscall.SIGTERM:
+			log.Println("[Exit signal] Shutting down HTTP server")
+			signal.Stop(signalChannel)
+			err := e.Close()
+			if err != nil {
+				log.Fatalln("An error occurred while trying to shutdown the server, fatal:", err)
+			}
+		}
+	}()
+
+	err := e.Start(":1323")
+	if err != nil && err != http.ErrServerClosed {
+		log.Fatalln("A server encountered an error, fatal:", err)
+	}
 }
