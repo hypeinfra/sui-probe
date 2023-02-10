@@ -16,6 +16,18 @@ import (
 	"time"
 )
 
+const HTMLNodeLoadHead = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/main.css">
+  <title>Project head</title>
+</head>
+<body>
+<div id="progress">Loading node info`
+
 type Template struct {
 	templates *template.Template
 }
@@ -82,6 +94,7 @@ func main() {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "private address space is disabled on this instance", "ip": nodeIP})
 			}
 
+			// 194.163.172.143:9000
 			userNode := sui.NewNode("http://" + ipaddr.String())
 			officialNode := sui.NewNode("https://" + sui.OfficialDevNode)
 
@@ -104,35 +117,26 @@ func main() {
 			for i := 0; i < 4; i++ {
 				// Write to stream that we are loading info
 				writeLoadingMessageOnce.Do(func() {
-					// <!DOCTYPE html>
-					// <html lang="en">
-					// <head>
-					//    <meta charset="UTF-8">
-					//    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-					//    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-					//    <link rel="stylesheet" href="/static/main.css">
-					//    <title>Project head</title>
-					// </head>
-					_, _ = c.Response().Write([]byte(`<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="/static/main.css">
-  <title>Project head</title>
-</head>
-<body>
-<div id="progress">Loading node info`))
+					// Start of HTML document
+					_, _ = c.Response().Write([]byte(HTMLNodeLoadHead))
 				})
 				_, _ = c.Response().Write([]byte("."))
 				c.Response().Flush()
 				time.Sleep(1 * time.Second)
 			}
+			// End of your HTML
 			_, _ = c.Response().Write([]byte("</div>"))
 			_, _ = c.Response().Write([]byte("<style>#progress { display: none; }</style>"))
 			c.Response().Flush()
+
 			g.Go(GatherNodeInfo(userNode, &providedNodeInfoWithSleep))
+			err = g.Wait()
+			if err != nil {
+				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
+			}
+
+			syncSpeed := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
+			isProvidedNodeOutdated := officialNodeInfo.Version != providedNodeInfo.Version
 
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
 				"ip":                    nodeIP,
@@ -144,6 +148,8 @@ func main() {
 				"schemasAmountOfficial": officialNodeInfo.SchemasAmount,
 				"methodsAmount":         providedNodeInfo.MethodsAmount,
 				"methodsAmountOfficial": officialNodeInfo.MethodsAmount,
+				"NodeSyncSpeed":         syncSpeed,
+				"NodeOutdated":          isProvidedNodeOutdated,
 			})
 		}
 		return c.Render(http.StatusOK, "index.gohtml", nil)
