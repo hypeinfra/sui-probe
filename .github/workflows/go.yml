@@ -28,7 +28,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: wangyoucao577/go-release-action@v1.35
         with:
-          project_path: ./cmd/healtcheck
+          project_path: ./cmd/healthcheck
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
