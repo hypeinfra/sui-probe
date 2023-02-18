@@ -2,6 +2,9 @@ package main
 
 import (
 	"github.com/Jeffail/gabs/v2"
+	"github.com/hypepartners/sui-probe/static"
+	"github.com/hypepartners/sui-probe/sui"
+	"github.com/hypepartners/sui-probe/templates"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/sync/errgroup"
@@ -12,9 +15,6 @@ import (
 	"net/netip"
 	"os"
 	"os/signal"
-	"sui/static"
-	"sui/sui"
-	"sui/templates"
 	"sync"
 	"syscall"
 	"time"
