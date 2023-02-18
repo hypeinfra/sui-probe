@@ -1,0 +1,48 @@
+{{ define "input-animation-js" -}}
+    <script>
+        let SuiSearchInput = document.querySelector('input[name="sui-node-address"]');
+        let SuiSearchParagraph = document.getElementsByTagName('p')[0];
+        document.onsubmit = function (e) {
+            let searchValue = SuiSearchInput.value;
+            if (searchValue === '') {
+                return;
+            }
+            e.preventDefault();
+            let xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        window.history.pushState(null, 'Node statistics', '/?sui-node-address=' + searchValue);
+                        document.title = 'Node statistics - ' + searchValue;
+                        document.write(xhr.responseText);
+                    } else {
+                        alert('Error: ' + xhr.status + ' ' + xhr.statusText)
+                    }
+                }
+            };
+            xhr.open('GET', '/?sui-node-address=' + searchValue, true);
+            xhr.send();
+
+            SuiSearchParagraph.style.transition = 'all 4s ease-in-out';
+            SuiSearchParagraph.style.visibility = 'hidden';
+            SuiSearchParagraph.style.opacity = '0';
+            SuiSearchParagraph.innerText = 'Collecting info for your node. Please wait around 5 seconds.';
+            SuiSearchParagraph.style.visibility = 'visible';
+            SuiSearchParagraph.style.opacity = '1';
+
+            SuiSearchInput.value = '↻';
+            SuiSearchInput.style.fontSize = '28px';
+            SuiSearchInput.style.lineHeight = '56px';
+            SuiSearchInput.style.textAlign = 'center';
+            SuiSearchInput.disabled = true;
+            SuiSearchInput.style.transitionDuration = '0.5s';
+            SuiSearchInput.placeholder = '';
+            SuiSearchInput.style.width = '56px';
+            SuiSearchInput.style.height = '56px';
+            SuiSearchInput.style.borderRadius = '28px';
+            setTimeout(function () {
+                SuiSearchInput.classList.add('rotating');
+            }, 500);
+        }
+    </script>
+{{ end -}}
