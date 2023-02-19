@@ -1,3 +1,5 @@
+![Sui Probe Logo](https://user-images.githubusercontent.com/44648612/219971097-7983f048-7fb9-4200-a0ea-948be481b6b2.png)
+
 # Sui Probe project
 
 A health-checker for your Sui Node, checks sync status and more.
