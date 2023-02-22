@@ -23,7 +23,7 @@ You need to have Golang, Git installed on your system.
 Run it directly from the source code:
 
 ```bash
-go run github.com/hypepartners/cmd/suiprobe@latest
+go run github.com/hypeinfra/sui-probe/cmd/suiprobe@latest
 ```
 
 Remember about `GOPROXY`, it will cache it for some time.
