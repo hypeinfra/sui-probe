@@ -1,4 +1,4 @@
-module github.com/hypepartners/sui-probe
+module github.com/hypeinfra/sui-probe
 
 go 1.20
 
