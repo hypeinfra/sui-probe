@@ -37,7 +37,7 @@ func NewNode(address string) *NodeClient {
 		},
 		Header: &http.Header{
 			"Content-Type": []string{"application/json"},
-			"User-Agent":   []string{"SUI-HealthCheck/0.0.0"},
+			"User-Agent":   []string{"SUI-HealthCheck/0.0.4 (+https://github.com/hypeinfra/sui-probe)"},
 		},
 	}
 }
