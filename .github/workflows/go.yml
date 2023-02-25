@@ -11,7 +11,7 @@ jobs:
       matrix:
         # build and publish in parallel a lot of binaries
         # https://golang.org/doc/install/source#environment See supported Go OS/Arch pairs here
-        goos: [ linux, darwin, openbsd, netbsd, dragonfly, plan9, windows, solaris, illumos ]
+        goos: [ linux, darwin, openbsd, netbsd, dragonfly, freebsd, plan9, windows, solaris, illumos ]
         goarch: [ amd64, arm64 ]
         exclude:
           - goarch: arm64
