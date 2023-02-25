@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/Jeffail/gabs/v2"
 	"github.com/hypeinfra/sui-probe/static"
 	"github.com/hypeinfra/sui-probe/sui"
@@ -79,7 +80,13 @@ func main() {
 	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
 
 	e := echo.New()
-	e.Use(middleware.Logger())
+	e.HideBanner = true
+	e.Use(middleware.LoggerWithConfig(
+		middleware.LoggerConfig{
+			Format:           `${time_custom} [Echo] ${latency_human} ${method} "${uri}" from ${remote_ip} "${user_agent}" | Error="${error}" ` + "\n",
+			CustomTimeFormat: "2006/01/02 15:04:05",
+		}))
+	e.Use(middleware.Recover())
 	e.Use(middleware.Gzip())
 
 	t := template.Must(template.ParseFS(templates.Templates, "*.gohtml", "*/*.gohtml"))
@@ -116,7 +123,9 @@ func main() {
 			g.Go(GatherNodeInfo(userNode, &providedNodeInfo))
 
 			err = g.Wait()
-			if err != nil {
+			if errors.Is(err, http.ErrHandlerTimeout) {
+				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Node timeout: " + err.Error(), "ip": nodeIP})
+			} else if err != nil {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
