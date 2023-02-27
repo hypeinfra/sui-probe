@@ -1,9 +1,18 @@
 <main id="node">
     <h1>Node statistics</h1>
     {{ if not .NodeIsOutdated }}
-    <p class="warning">Your node needs an update, master node have different version.</p>
+        <p class="warning">Your node needs an update, official node have different version.</p>
     {{ end }}
-    <p>Node sync speed: {{ .NodeSyncSpeed }} TPS</p>
+    {{ if .NodeSyncTransactionsInvalid }}
+        <br>
+        <p class="warning">Your node have more transactions than official node!</p>
+    {{ end }}
+    {{ if not .NodeSyncTransactionsInvalid }}
+        <p>Node sync speed: {{ .NodeSyncSpeed }} TPS | {{ .NodeSyncStatus }} | Around {{ .NodeSyncTimeWait }} for full
+            sync.</p>
+    {{ else }}
+        <p>Node sync speed: {{ .NodeSyncSpeed }} TPS</p>
+    {{ end }}
     <table>
         <thead>
         <tr>

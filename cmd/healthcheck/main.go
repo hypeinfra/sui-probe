@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/Jeffail/gabs/v2"
 	"github.com/hypeinfra/sui-probe/static"
 	"github.com/hypeinfra/sui-probe/sui"
@@ -109,7 +110,6 @@ func main() {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "private address space is disabled on this instance", "ip": nodeIP})
 			}
 
-			// 194.163.172.143:9000
 			userNode := sui.NewNode("http://" + ipaddr.String())
 			officialNode := sui.NewNode("https://" + sui.OfficialDevNode)
 
@@ -153,20 +153,27 @@ func main() {
 			}
 
 			syncSpeed := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
+			syncStatusInPercents := float64(providedNodeInfo.Transactions) / float64(officialNodeInfo.Transactions) * 100
+			// If transactions amount is more than on official node, then something is wrong
+			syncTransactionsInvalid := providedNodeInfo.Transactions > officialNodeInfo.Transactions
+			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(syncSpeed)) * time.Second
 			isProvidedNodeOutdated := officialNodeInfo.Version != providedNodeInfo.Version
 
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
-				"ip":                    nodeIP,
-				"transactions":          providedNodeInfo.Transactions,
-				"transactionsOfficial":  officialNodeInfo.Transactions,
-				"version":               providedNodeInfo.Version,
-				"versionOfficial":       officialNodeInfo.Version,
-				"schemasAmount":         providedNodeInfo.SchemasAmount,
-				"schemasAmountOfficial": officialNodeInfo.SchemasAmount,
-				"methodsAmount":         providedNodeInfo.MethodsAmount,
-				"methodsAmountOfficial": officialNodeInfo.MethodsAmount,
-				"NodeSyncSpeed":         syncSpeed,
-				"NodeOutdated":          isProvidedNodeOutdated,
+				"ip":                          nodeIP,
+				"transactions":                providedNodeInfo.Transactions,
+				"transactionsOfficial":        officialNodeInfo.Transactions,
+				"version":                     providedNodeInfo.Version,
+				"versionOfficial":             officialNodeInfo.Version,
+				"schemasAmount":               providedNodeInfo.SchemasAmount,
+				"schemasAmountOfficial":       officialNodeInfo.SchemasAmount,
+				"methodsAmount":               providedNodeInfo.MethodsAmount,
+				"methodsAmountOfficial":       officialNodeInfo.MethodsAmount,
+				"NodeSyncSpeed":               syncSpeed,
+				"NodeOutdated":                isProvidedNodeOutdated,
+				"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
+				"NodeSyncTimeWait":            syncPredictedTimeWait,
+				"NodeSyncTransactionsInvalid": syncTransactionsInvalid,
 			})
 		}
 		return c.Render(http.StatusOK, "index.gohtml", nil)
