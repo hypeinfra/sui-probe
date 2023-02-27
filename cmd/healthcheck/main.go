@@ -112,12 +112,35 @@ func main() {
 
 			userNode := sui.NewNode("http://" + ipaddr.String())
 			officialNode := sui.NewNode("https://" + sui.OfficialDevNode)
+			userNodeMetrics := sui.NewMetricsClient("http://" + ipaddr.Addr().String() + ":9184")
 
 			g := new(errgroup.Group)
 
 			var (
 				officialNodeInfo, providedNodeInfo, providedNodeInfoWithSleep NodeInfo
+				uptimeDuration                                                time.Duration
+				providedNodePeers                                             uint64
 			)
+
+			g.Go(func() error {
+				err := userNodeMetrics.GetMetrics()
+				if err != nil {
+					return err
+				}
+				uptime, err := userNodeMetrics.GetUptime()
+				if err != nil {
+					return err
+				}
+				uptimeDuration, err = time.ParseDuration(uptime + "s")
+				if err != nil {
+					return err
+				}
+				providedNodePeers, err = userNodeMetrics.GetPeers()
+				if err != nil {
+					return err
+				}
+				return nil
+			})
 
 			g.Go(GatherNodeInfo(officialNode, &officialNodeInfo))
 			g.Go(GatherNodeInfo(userNode, &providedNodeInfo))
@@ -174,6 +197,8 @@ func main() {
 				"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
 				"NodeSyncTimeWait":            syncPredictedTimeWait,
 				"NodeSyncTransactionsInvalid": syncTransactionsInvalid,
+				"NodeUptime":                  uptimeDuration,
+				"NodePeers":                   providedNodePeers,
 			})
 		}
 		return c.Render(http.StatusOK, "index.gohtml", nil)
