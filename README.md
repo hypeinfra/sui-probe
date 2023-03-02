@@ -16,6 +16,8 @@ It also works without Javascript.
 
 You can install pre-compiled binaries from the releases page or compile this project from the source.
 
+You can also check out [installation instructions] in the wiki.
+
 ### Compilation
 
 You need to have Golang, Git installed on your system.
@@ -29,6 +31,10 @@ go run github.com/hypeinfra/sui-probe/cmd/suiprobe@latest
 Remember about `GOPROXY`, it will cache it for some time.
 Change it to `direct` if you want to get the latest version.
 
+### Systemd service
+
+You can run it as a systemd service, check the [instructions] in the wiki.
+
 ## Hacking
 
 Directory structure:
@@ -37,3 +43,6 @@ Directory structure:
 - `sui` - Sui client library (API)
 - `templates` - HTML templates
 - `static` - static assets (CSS, JS, images)
+
+[installation instructions]: https://github.com/hypeinfra/sui-probe/wiki/Installation
+[instructions]: https://github.com/hypeinfra/sui-probe/wiki/Systemd
