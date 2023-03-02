@@ -204,3 +204,48 @@ func (m *MetricsClient) GetPeers() (uint64, error) {
 	}
 	return 0, fmt.Errorf("could not find peers metric")
 }
+
+// GetCurrentEpoch returns the current epoch of the node
+func (m *MetricsClient) GetCurrentEpoch() (uint64, error) {
+	for _, line := range m.Text {
+		if len(line) > 13 {
+			if line[0:13] == "current_epoch" {
+				// In the version 0.27.0 this line looks like this:
+				// current_epoch 8
+				return strconv.ParseUint(strings.Split(line, " ")[1], 10, 64)
+			}
+		}
+	}
+	return 0, fmt.Errorf("could not find current epoch metric")
+}
+
+// GetCurrentVotingRight returns the current voting right of the node
+func (m *MetricsClient) GetCurrentVotingRight() (uint64, error) {
+	for _, line := range m.Text {
+		if len(line) > 20 {
+			if line[0:20] == "current_voting_right" {
+				// In the version 0.27.0 this line looks like this:
+				// current_voting_right 0
+				return strconv.ParseUint(strings.Split(line, " ")[1], 10, 64)
+			}
+		}
+	}
+	return 0, fmt.Errorf("could not find current voting right metric")
+}
+
+func (m *MetricsClient) GetTotalEpochDuration() (time.Duration, error) {
+	for _, line := range m.Text {
+		if len(line) > 20 {
+			if line[0:20] == "epoch_total_duration" {
+				// In the version 0.27.0 this line looks like this:
+				// total_epoch_duration 12345678
+				milliseconds, err := strconv.ParseUint(strings.Split(line, " ")[1], 10, 64)
+				if err != nil {
+					return 0, err
+				}
+				return time.Duration(milliseconds) * time.Millisecond, nil
+			}
+		}
+	}
+	return 0, fmt.Errorf("could not find total epoch duration metric")
+}

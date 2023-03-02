@@ -3,13 +3,16 @@
     {{ if not .NodeIsOutdated }}
         <p class="warning">Your node needs an update, official node have different version.</p>
     {{ end }}
+    {{ if .NodeSyncZeroSpeedCheck }}
+        <br>
+        <p class="warning">Your node is not syncing, please check your node logs.</p>
+    {{ end }}
     {{ if .NodeSyncTransactionsInvalid }}
         <br>
         <p class="warning">Your node have more transactions than official node!</p>
     {{ end }}
     {{ if not .NodeSyncTransactionsInvalid }}
-        <p>Node sync speed: {{ .NodeSyncSpeed }} TPS | {{ .NodeSyncStatus }} | Around {{ .NodeSyncTimeWait }} for full
-            sync.</p>
+        <p>Node sync speed: {{ .NodeSyncSpeed }} TPS | {{ .NodeSyncStatus }} {{ if not .NodeSyncZeroSpeedCheck }}| Around {{ .NodeSyncTimeWait }} for full sync. {{ end }}</p>
     {{ else }}
         <p>Node sync speed: {{ .NodeSyncSpeed }} TPS</p>
     {{ end }}
@@ -47,6 +50,9 @@
     <h2>Node performance</h2>
     <p>Uptime: {{ .NodeUptime }}</p>
     <p>Amount of connected peers: {{ .NodePeers }}</p>
+    <p>Current epoch: {{ .NodeCurrentEpoch }}</p>
+    <p>Total epoch duration: {{ .NodeTotalEpochDuration }}</p>
+    <p>Node current voting power: {{ .NodeCurrentVotingRight }}</p>
 </main>
 {{ template "footer" . }}
 </body>

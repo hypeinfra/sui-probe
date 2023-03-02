@@ -118,8 +118,8 @@ func main() {
 
 			var (
 				officialNodeInfo, providedNodeInfo, providedNodeInfoWithSleep NodeInfo
-				uptimeDuration                                                time.Duration
-				providedNodePeers                                             uint64
+				uptimeDuration, totalEpochDuration                            time.Duration
+				providedNodePeers, currentEpoch, currentVotingRight           uint64
 			)
 
 			g.Go(func() error {
@@ -136,6 +136,18 @@ func main() {
 					return err
 				}
 				providedNodePeers, err = userNodeMetrics.GetPeers()
+				if err != nil {
+					return err
+				}
+				currentEpoch, err = userNodeMetrics.GetCurrentEpoch()
+				if err != nil {
+					return err
+				}
+				totalEpochDuration, err = userNodeMetrics.GetTotalEpochDuration()
+				if err != nil {
+					return err
+				}
+				currentVotingRight, err = userNodeMetrics.GetCurrentVotingRight()
 				if err != nil {
 					return err
 				}
@@ -181,6 +193,7 @@ func main() {
 			syncTransactionsInvalid := providedNodeInfo.Transactions > officialNodeInfo.Transactions
 			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(syncSpeed)) * time.Second
 			isProvidedNodeOutdated := officialNodeInfo.Version != providedNodeInfo.Version
+			syncZeroSpeedCheck := syncSpeed == 0 && providedNodeInfo.Transactions != officialNodeInfo.Transactions
 
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
 				"ip":                          nodeIP,
@@ -199,6 +212,10 @@ func main() {
 				"NodeSyncTransactionsInvalid": syncTransactionsInvalid,
 				"NodeUptime":                  uptimeDuration,
 				"NodePeers":                   providedNodePeers,
+				"NodeSyncZeroSpeedCheck":      syncZeroSpeedCheck,
+				"NodeCurrentEpoch":            currentEpoch,
+				"NodeTotalEpochDuration":      totalEpochDuration,
+				"NodeCurrentVotingRight":      currentVotingRight,
 			})
 		}
 		return c.Render(http.StatusOK, "index.gohtml", nil)
