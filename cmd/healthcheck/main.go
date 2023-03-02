@@ -95,6 +95,10 @@ func main() {
 		t,
 	}
 
+	e.GET("/troubleshooting", func(c echo.Context) error {
+		return c.Render(http.StatusOK, "troubleshooting.gohtml", nil)
+	})
+
 	e.GET("/", func(c echo.Context) error {
 		nodeIP := c.QueryParam("sui-node-address")
 		if nodeIP != "" {

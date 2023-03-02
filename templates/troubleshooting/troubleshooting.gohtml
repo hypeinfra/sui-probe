@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ template "head" . }}
+<body>
+<main id="troubleshooting">
+    <h1>Troubleshooting your node</h1>
+    <p>There are a few things you can do to troubleshoot your node.</p>
+    <section id="My_node_is_not_syncing">
+        <h2><a href="#My_node_is_not_syncing">My node is not syncing</a></h2>
+        <p>While node is still in development it can happen quite randomly. You can try these methods:</p>
+        <section id="Deleting_Sui_Database">
+            <h3><a href="#Deleting_Sui_Database">Deleting <code>Sui Database</code></a></h3>
+            <p>By deleting it you can restart the whole sync process.</p>
+            <ul>
+                <li>Find <strong>suidb</strong> folder: <code>find / -name suidb</code></li>
+                <li>And remove it by using <code>rm -rf</code></li>
+            </ul>
+        </section>
+    </section>
+</main>
+{{ template "footer" . }}
+</body>

@@ -21,6 +21,10 @@ body {
     overflow-x: hidden;
 }
 
+main#node + footer {
+    position: relative;
+}
+
 footer {
     position: absolute;
     bottom: 0;
@@ -131,6 +135,39 @@ body > main > table {
     background-color: #fff3cd;
     border-color: #ffeeba;
 
+}
+
+main#troubleshooting {
+    padding: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+main#troubleshooting ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+main#troubleshooting ul li {
+    margin-bottom: 0.5rem;
+}
+
+main#troubleshooting section section {
+    padding-left: 1rem;
+    border-left: 1px solid #ced4da;
+}
+
+main#troubleshooting h2 a, main#troubleshooting h3 a {
+    text-decoration: none;
+    color: inherit;
+}
+
+code {
+    background-color: #f8f9fa;
+    padding: 0.2rem 0.4rem;
+    font-size: 90%;
+    color: #e83e8c;
+    border-radius: 0.25rem;
 }
 
 /* Dark theme */
