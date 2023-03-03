@@ -6,6 +6,13 @@ A health-checker for your Sui Node, checks sync status and more.
 
 Specifically made easy to deploy on any Golang supported platforms, including Plan9 and Illumos.
 
+## Screenshots
+
+<p align="center">
+  <img alt="Main page" src="https://user-images.githubusercontent.com/44648612/222745823-2d39171b-4e09-46d4-8c9e-471c2e175510.png" width="45%">
+  <img alt="Node statistics page" src="https://user-images.githubusercontent.com/44648612/222745813-34c752e7-5a08-4457-8dab-77db27e85f78.png" width="45%">
+</p>
+
 ## Usage
 
 Run the executable and navigate to `http://localhost:1323` to see the main page.
