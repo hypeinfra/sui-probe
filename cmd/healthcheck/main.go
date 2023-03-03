@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/Jeffail/gabs/v2"
 	"github.com/hypeinfra/sui-probe/static"
@@ -17,6 +16,7 @@ import (
 	"net/netip"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -124,37 +124,22 @@ func main() {
 				officialNodeInfo, providedNodeInfo, providedNodeInfoWithSleep NodeInfo
 				uptimeDuration, totalEpochDuration                            time.Duration
 				providedNodePeers, currentEpoch, currentVotingRight           uint64
+				metricsNotAvailable                                           bool
 			)
 
 			g.Go(func() error {
-				err := userNodeMetrics.GetMetrics()
-				if err != nil {
-					return err
+				_ = userNodeMetrics.GetMetrics()
+				uptime, _ := userNodeMetrics.GetUptime()
+				// if there is no uptime, then we can't get any metrics
+				if uptime == "" {
+					metricsNotAvailable = true
+					return nil
 				}
-				uptime, err := userNodeMetrics.GetUptime()
-				if err != nil {
-					return err
-				}
-				uptimeDuration, err = time.ParseDuration(uptime + "s")
-				if err != nil {
-					return err
-				}
-				providedNodePeers, err = userNodeMetrics.GetPeers()
-				if err != nil {
-					return err
-				}
-				currentEpoch, err = userNodeMetrics.GetCurrentEpoch()
-				if err != nil {
-					return err
-				}
-				totalEpochDuration, err = userNodeMetrics.GetTotalEpochDuration()
-				if err != nil {
-					return err
-				}
-				currentVotingRight, err = userNodeMetrics.GetCurrentVotingRight()
-				if err != nil {
-					return err
-				}
+				uptimeDuration, _ = time.ParseDuration(uptime + "s")
+				providedNodePeers, _ = userNodeMetrics.GetPeers()
+				currentEpoch, _ = userNodeMetrics.GetCurrentEpoch()
+				totalEpochDuration, _ = userNodeMetrics.GetTotalEpochDuration()
+				currentVotingRight, _ = userNodeMetrics.GetCurrentVotingRight()
 				return nil
 			})
 
@@ -162,8 +147,10 @@ func main() {
 			g.Go(GatherNodeInfo(userNode, &providedNodeInfo))
 
 			err = g.Wait()
-			if errors.Is(err, http.ErrHandlerTimeout) {
-				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Node timeout: " + err.Error(), "ip": nodeIP})
+			if strings.Contains(err.Error(), "context deadline exceeded") {
+				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Node timeout. Check if your node is running, your firewall rules and node's logs.", "ip": nodeIP})
+			} else if strings.Contains(err.Error(), "machine actively refused it.") {
+				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Your node is actively rejecting the connection. Perhaps you are using a different port or have forgotten to add rules to your firewall?", "ip": nodeIP})
 			} else if err != nil {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
@@ -199,6 +186,26 @@ func main() {
 			isProvidedNodeOutdated := officialNodeInfo.Version != providedNodeInfo.Version
 			syncZeroSpeedCheck := syncSpeed == 0 && providedNodeInfo.Transactions != officialNodeInfo.Transactions
 
+			if metricsNotAvailable {
+				return c.Render(http.StatusOK, "node.gohtml", map[string]any{
+					"ip":                          nodeIP,
+					"transactions":                providedNodeInfo.Transactions,
+					"transactionsOfficial":        officialNodeInfo.Transactions,
+					"version":                     providedNodeInfo.Version,
+					"versionOfficial":             officialNodeInfo.Version,
+					"schemasAmount":               providedNodeInfo.SchemasAmount,
+					"schemasAmountOfficial":       officialNodeInfo.SchemasAmount,
+					"methodsAmount":               providedNodeInfo.MethodsAmount,
+					"methodsAmountOfficial":       officialNodeInfo.MethodsAmount,
+					"NodeSyncSpeed":               syncSpeed,
+					"NodeOutdated":                isProvidedNodeOutdated,
+					"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
+					"NodeSyncTimeWait":            syncPredictedTimeWait,
+					"NodeSyncTransactionsInvalid": syncTransactionsInvalid,
+					"NoStats":                     metricsNotAvailable,
+				})
+			}
+
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
 				"ip":                          nodeIP,
 				"transactions":                providedNodeInfo.Transactions,
@@ -214,6 +221,7 @@ func main() {
 				"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
 				"NodeSyncTimeWait":            syncPredictedTimeWait,
 				"NodeSyncTransactionsInvalid": syncTransactionsInvalid,
+				"NoStats":                     metricsNotAvailable,
 				"NodeUptime":                  uptimeDuration,
 				"NodePeers":                   providedNodePeers,
 				"NodeSyncZeroSpeedCheck":      syncZeroSpeedCheck,

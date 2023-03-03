@@ -48,11 +48,15 @@
         </tbody>
     </table>
     <h2>Node performance</h2>
-    <p>Uptime: {{ .NodeUptime }}</p>
-    <p>Amount of connected peers: {{ .NodePeers }}</p>
-    <p>Current epoch: {{ .NodeCurrentEpoch }}</p>
-    <p>Total epoch duration: {{ .NodeTotalEpochDuration }}</p>
-    <p>Node current voting power: {{ .NodeCurrentVotingRight }}</p>
+    {{ if .NoStats }}
+        <p>No information available, do you have an open metrics port?</p>
+    {{ else }}
+        <p>Uptime: {{ .NodeUptime }}</p>
+        <p>Amount of connected peers: {{ .NodePeers }}</p>
+        <p>Current epoch: {{ .NodeCurrentEpoch }}</p>
+        <p>Total epoch duration: {{ .NodeTotalEpochDuration }}</p>
+        <p>Node current voting power: {{ .NodeCurrentVotingRight }}</p>
+    {{ end }}
 </main>
 {{ template "footer" . }}
 </body>
