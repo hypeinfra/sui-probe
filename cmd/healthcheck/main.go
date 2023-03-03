@@ -147,9 +147,9 @@ func main() {
 			g.Go(GatherNodeInfo(userNode, &providedNodeInfo))
 
 			err = g.Wait()
-			if strings.Contains(err.Error(), "context deadline exceeded") {
+			if err != nil && strings.Contains(err.Error(), "context deadline exceeded") {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Node timeout. Check if your node is running, your firewall rules and node's logs.", "ip": nodeIP})
-			} else if strings.Contains(err.Error(), "machine actively refused it.") {
+			} else if err != nil && strings.Contains(err.Error(), "machine actively refused it.") {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Your node is actively rejecting the connection. Perhaps you are using a different port or have forgotten to add rules to your firewall?", "ip": nodeIP})
 			} else if err != nil {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
