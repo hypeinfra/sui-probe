@@ -17,7 +17,6 @@ import (
 	"os"
 	"os/signal"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 )
@@ -127,6 +126,27 @@ func main() {
 				metricsNotAvailable                                                                      bool
 			)
 
+			// Loading message
+			c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
+			_, _ = c.Response().Write([]byte(HTMLNodeLoadHead))
+			// channel for writing to stream
+			stillWritingToStream := make(chan bool, 1)
+			// Write to stream that we are loading info
+			go func() {
+				t := time.NewTicker(time.Second)
+				defer t.Stop()
+			outer:
+				for {
+					select {
+					case <-t.C:
+						_, _ = c.Response().Write([]byte("."))
+						c.Response().Flush()
+					case <-stillWritingToStream:
+						break outer
+					}
+				}
+			}()
+
 			g.Go(func() error {
 				_ = userNodeMetrics.GetMetrics()
 				uptime, _ := userNodeMetrics.GetUptime()
@@ -155,32 +175,14 @@ func main() {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
-			// Loading message
-			c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
-			writeLoadingMessageOnce := sync.Once{}
-			for i := 0; i < 3; i++ {
-				// Write to stream that we are loading info
-				writeLoadingMessageOnce.Do(func() {
-					// Start of HTML document
-					_, _ = c.Response().Write([]byte(HTMLNodeLoadHead))
-				})
-				_, _ = c.Response().Write([]byte("."))
-				c.Response().Flush()
-				time.Sleep(1 * time.Second)
-			}
+			time.Sleep(3 * time.Second)
 
 			// Gather info after 3 seconds
 			g.Go(GatherNodeInfo(userNode, &providedNodeInfoWithSleep))
 			g.Go(GatherNodeInfo(officialNode, &officialNodeInfoWithSleep))
 
-			// Write to stream that we are loading info
-			g.Go(func() error {
-				_, err = c.Response().Write([]byte("."))
-				c.Response().Flush()
-				time.Sleep(1 * time.Second)
-				return err
-			})
 			err = g.Wait()
+			stillWritingToStream <- true
 
 			// End of our HTML, so we can hide those dots
 			_, _ = c.Response().Write([]byte("</div>"))
