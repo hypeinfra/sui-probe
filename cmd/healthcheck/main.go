@@ -168,10 +168,22 @@ func main() {
 
 			err = g.Wait()
 			if err != nil && strings.Contains(err.Error(), "context deadline exceeded") {
+				// End of our HTML, so we can hide those dots
+				_, _ = c.Response().Write([]byte("</div>"))
+				_, _ = c.Response().Write([]byte("<style>#progress { display: none; }</style>"))
+				c.Response().Flush()
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Node timeout. Check if your node is running, your firewall rules and node's logs.", "ip": nodeIP})
 			} else if err != nil && strings.Contains(err.Error(), "machine actively refused it.") {
+				// End of our HTML, so we can hide those dots
+				_, _ = c.Response().Write([]byte("</div>"))
+				_, _ = c.Response().Write([]byte("<style>#progress { display: none; }</style>"))
+				c.Response().Flush()
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": "Your node is actively rejecting the connection. Perhaps you are using a different port or have forgotten to add rules to your firewall?", "ip": nodeIP})
 			} else if err != nil {
+				// End of our HTML, so we can hide those dots
+				_, _ = c.Response().Write([]byte("</div>"))
+				_, _ = c.Response().Write([]byte("<style>#progress { display: none; }</style>"))
+				c.Response().Flush()
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
