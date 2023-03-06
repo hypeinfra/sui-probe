@@ -1,4 +1,7 @@
-![Sui Probe Logo](https://user-images.githubusercontent.com/44648612/219971097-7983f048-7fb9-4200-a0ea-948be481b6b2.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/44648612/223167295-4ae8da21-4a8d-4f17-b518-3263bc6b539d.png">
+  <img alt="Sui Probe Logo" src="https://user-images.githubusercontent.com/44648612/219971097-7983f048-7fb9-4200-a0ea-948be481b6b2.png">
+</picture>
 
 # Sui Probe project
 
