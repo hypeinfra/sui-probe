@@ -33,12 +33,35 @@ footer {
     justify-content: center;
 }
 
+@media (max-height: 650px) {
+    body footer {
+        position: relative;
+    }
+}
+
+@media (max-width: 620px) {
+    footer {
+        text-align: center;
+        flex-direction: column;
+    }
+    footer ul {
+        padding-left: 0;
+    }
+    body footer ul:last-of-type {
+        padding-right: 0;
+    }
+}
+
 footer ul li {
     list-style-type: none;
 }
 
 footer ul li:has(strong) {
     margin-bottom: 0.5rem;
+}
+
+footer ul:last-of-type {
+    padding-right: 2.5rem;
 }
 
 header {
@@ -65,6 +88,15 @@ main#main-page {
         transform: translate(-50%, -50%);
         width: 100%;
         margin: auto;
+    }
+}
+
+@media (max-height: 650px) {
+    body main#main-page {
+        position: relative;
+        top: 0;
+        left: 0;
+        transform: none;
     }
 }
 
