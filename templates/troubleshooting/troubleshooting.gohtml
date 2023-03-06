@@ -2,6 +2,7 @@
 <html lang="en">
 {{ template "head" . }}
 <body>
+{{ template "header" . }}
 <main id="troubleshooting">
     <h1>Troubleshooting your node</h1>
     <p>There are a few things you can do to troubleshoot your node.</p>
@@ -16,6 +17,38 @@
                 <li>And remove it by using <code>rm -rf</code></li>
             </ul>
         </section>
+    </section>
+    <h2>Warnings explanation</h2>
+    <section>
+        <p class="warning">Your node needs an update, official node have different version.</p>
+        <p>
+            It means that your node is not up-to-date with the official node.
+            Check if there is any available updates on
+            <a href="https://github.com/MystenLabs/sui/releases/latest">Sui's github</a>.
+        </p>
+    </section>
+    <section>
+        <p class="warning">Your node is not syncing, please check your node logs.</p>
+        <p>This means that your node is not synchronising with the network. Check your node logs for more information.</p>
+    </section>
+    <section>
+        <p class="warning">Your node have more transactions than official node!</p>
+        <p>
+            It means that your node has more transactions than the official node.
+            This can happen because you are using an older version of Sui devnet than the official one.
+        </p>
+    </section>
+    <section>
+        <p class="warning">Your node is syncing slower than the official node. If this continues for more than a day,
+            it might never catch up</p>
+        <p>
+            This means that your node is synchronising slower than the official node.<br><br>
+            This can happen because you are using underpowered hardware, such as a VPS with slow SSD, slow CPU or slow
+            memory.<br><br>
+            VPS providers may oversell their hardware, so you may be sharing your resources with other users and this
+            may slow down your node.<br><br>
+            It can also happen because of some network issues and many other reasons.
+        </p>
     </section>
 </main>
 {{ template "footer" . }}

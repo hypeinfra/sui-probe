@@ -146,7 +146,7 @@ body > main > table {
 
 main#troubleshooting {
     padding: 1rem;
-    max-width: 600px;
+    max-width: 650px;
     margin: 0 auto;
 }
 
@@ -167,6 +167,10 @@ main#troubleshooting section section {
 main#troubleshooting h2 a, main#troubleshooting h3 a {
     text-decoration: none;
     color: inherit;
+}
+
+main#troubleshooting + footer {
+    position: relative;
 }
 
 code {
