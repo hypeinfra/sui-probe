@@ -96,7 +96,7 @@ func main() {
 	}
 
 	e.GET("/troubleshooting", func(c echo.Context) error {
-		return c.Render(http.StatusOK, "troubleshooting.gohtml", nil)
+		return c.Render(http.StatusOK, "troubleshooting.gohtml", map[string]any{"Title": "Troubleshooting Sui Node"})
 	})
 
 	e.GET("/", func(c echo.Context) error {
@@ -203,6 +203,7 @@ func main() {
 
 			if metricsNotAvailable {
 				return c.Render(http.StatusOK, "node.gohtml", map[string]any{
+					"Title":                       "Node metrics",
 					"ip":                          nodeIP,
 					"transactions":                providedNodeInfo.Transactions,
 					"transactionsOfficial":        officialNodeInfo.Transactions,
@@ -224,6 +225,7 @@ func main() {
 			}
 
 			return c.Render(http.StatusOK, "node.gohtml", map[string]any{
+				"Title":                       "Node metrics",
 				"ip":                          nodeIP,
 				"transactions":                providedNodeInfo.Transactions,
 				"transactionsOfficial":        officialNodeInfo.Transactions,
