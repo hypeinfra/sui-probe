@@ -16,6 +16,17 @@
                         document.title = 'Node statistics - ' + searchValue;
                         document.write(xhr.responseText);
                     } else {
+                        SuiSearchParagraph.innerText = 'An error occurred! Please try again.'
+                        SuiSearchInput.classList.remove('rotating');
+                        SuiSearchInput.value = searchValue;
+                        SuiSearchInput.style.fontSize = '16px';
+                        SuiSearchInput.style.lineHeight = 'unset';
+                        SuiSearchInput.style.textAlign = 'unset';
+                        SuiSearchInput.disabled = false;
+                        SuiSearchInput.placeholder = 'Node IP with port. Example: 127.0.0.1:9000';
+                        SuiSearchInput.style.width = '100%';
+                        SuiSearchInput.style.height = 'unset';
+                        SuiSearchInput.style.borderRadius = '6px';
                         alert('Error: ' + xhr.status + ' ' + xhr.statusText)
                     }
                 }
