@@ -121,10 +121,10 @@ func main() {
 			g := new(errgroup.Group)
 
 			var (
-				officialNodeInfo, providedNodeInfo, providedNodeInfoWithSleep NodeInfo
-				uptimeDuration, totalEpochDuration                            time.Duration
-				providedNodePeers, currentEpoch, currentVotingRight           uint64
-				metricsNotAvailable                                           bool
+				officialNodeInfo, providedNodeInfo, providedNodeInfoWithSleep, officialNodeInfoWithSleep NodeInfo
+				uptimeDuration, totalEpochDuration                                                       time.Duration
+				providedNodePeers, currentEpoch, currentVotingRight                                      uint64
+				metricsNotAvailable                                                                      bool
 			)
 
 			g.Go(func() error {
@@ -155,9 +155,10 @@ func main() {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
+			// Loading message
 			c.Response().Header().Set(echo.HeaderContentType, echo.MIMETextHTMLCharsetUTF8)
 			writeLoadingMessageOnce := sync.Once{}
-			for i := 0; i < 4; i++ {
+			for i := 0; i < 3; i++ {
 				// Write to stream that we are loading info
 				writeLoadingMessageOnce.Do(func() {
 					// Start of HTML document
@@ -167,24 +168,37 @@ func main() {
 				c.Response().Flush()
 				time.Sleep(1 * time.Second)
 			}
-			// End of your HTML
+
+			// Gather info after 3 seconds
+			g.Go(GatherNodeInfo(userNode, &providedNodeInfoWithSleep))
+			g.Go(GatherNodeInfo(officialNode, &officialNodeInfoWithSleep))
+
+			// Write to stream that we are loading info
+			g.Go(func() error {
+				_, err = c.Response().Write([]byte("."))
+				c.Response().Flush()
+				time.Sleep(1 * time.Second)
+				return err
+			})
+			err = g.Wait()
+
+			// End of our HTML, so we can hide those dots
 			_, _ = c.Response().Write([]byte("</div>"))
 			_, _ = c.Response().Write([]byte("<style>#progress { display: none; }</style>"))
 			c.Response().Flush()
 
-			g.Go(GatherNodeInfo(userNode, &providedNodeInfoWithSleep))
-			err = g.Wait()
 			if err != nil {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
-			syncSpeed := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
+			ProvidedNodeTPS := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
+			OfficialNodeTPS := officialNodeInfoWithSleep.Transactions - officialNodeInfo.Transactions
 			syncStatusInPercents := float64(providedNodeInfo.Transactions) / float64(officialNodeInfo.Transactions) * 100
 			// If transactions amount is more than on official node, then something is wrong
 			syncTransactionsInvalid := providedNodeInfo.Transactions > officialNodeInfo.Transactions
-			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(syncSpeed)) * time.Second
+			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(ProvidedNodeTPS)) * time.Second
 			isProvidedNodeOutdated := officialNodeInfo.Version != providedNodeInfo.Version
-			syncZeroSpeedCheck := syncSpeed == 0 && providedNodeInfo.Transactions != officialNodeInfo.Transactions
+			syncZeroSpeedCheck := ProvidedNodeTPS == 0 && providedNodeInfo.Transactions != officialNodeInfo.Transactions
 
 			if metricsNotAvailable {
 				return c.Render(http.StatusOK, "node.gohtml", map[string]any{
@@ -197,7 +211,8 @@ func main() {
 					"schemasAmountOfficial":       officialNodeInfo.SchemasAmount,
 					"methodsAmount":               providedNodeInfo.MethodsAmount,
 					"methodsAmountOfficial":       officialNodeInfo.MethodsAmount,
-					"NodeSyncSpeed":               syncSpeed,
+					"NodeTPS":                     ProvidedNodeTPS,
+					"OfficialNodeTPS":             OfficialNodeTPS,
 					"NodeOutdated":                isProvidedNodeOutdated,
 					"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
 					"NodeSyncTimeWait":            syncPredictedTimeWait,
@@ -216,7 +231,8 @@ func main() {
 				"schemasAmountOfficial":       officialNodeInfo.SchemasAmount,
 				"methodsAmount":               providedNodeInfo.MethodsAmount,
 				"methodsAmountOfficial":       officialNodeInfo.MethodsAmount,
-				"NodeSyncSpeed":               syncSpeed,
+				"NodeTPS":                     ProvidedNodeTPS,
+				"OfficialNodeTPS":             OfficialNodeTPS,
 				"NodeOutdated":                isProvidedNodeOutdated,
 				"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
 				"NodeSyncTimeWait":            syncPredictedTimeWait,

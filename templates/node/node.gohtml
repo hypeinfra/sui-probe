@@ -12,9 +12,9 @@
         <p class="warning">Your node have more transactions than official node!</p>
     {{ end }}
     {{ if not .NodeSyncTransactionsInvalid }}
-        <p>Node sync speed: {{ .NodeSyncSpeed }} TPS | {{ .NodeSyncStatus }} {{ if not .NodeSyncZeroSpeedCheck }}| Around {{ .NodeSyncTimeWait }} for full sync. {{ end }}</p>
+        <p>Node sync speed: {{ .NodeTPS }} TPS | {{ .NodeSyncStatus }} {{ if not .NodeSyncZeroSpeedCheck }}| Around {{ .NodeSyncTimeWait }} for full sync. {{ end }}</p>
     {{ else }}
-        <p>Node sync speed: {{ .NodeSyncSpeed }} TPS</p>
+        <p>Node sync speed: {{ .NodeTPS }} TPS</p>
     {{ end }}
     <table>
         <thead>
@@ -27,8 +27,8 @@
         <tbody>
         <tr>
             <td>Amount of node transactions</td>
-            <td>{{ .transactionsOfficial }}</td>
-            <td>{{ .transactions }}</td>
+            <td>{{ .transactionsOfficial }} ({{ .OfficialNodeTPS}} TPS)</td>
+            <td>{{ .transactions }} ({{ .NodeTPS}} TPS)</td>
         </tr>
         <tr>
             <td>Node version</td>
