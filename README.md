@@ -9,8 +9,8 @@ Specifically made easy to deploy on any Golang supported platforms, including Pl
 ## Screenshots
 
 <p align="center">
-  <img alt="Main page" src="https://user-images.githubusercontent.com/44648612/222745823-2d39171b-4e09-46d4-8c9e-471c2e175510.png" width="45%">
-  <img alt="Node statistics page" src="https://user-images.githubusercontent.com/44648612/222745813-34c752e7-5a08-4457-8dab-77db27e85f78.png" width="45%">
+  <img alt="Main page" src="https://user-images.githubusercontent.com/44648612/223162002-52e8f16e-dace-4049-8718-bece9048b03f.png" width="45%">
+  <img alt="Node statistics page" src="https://user-images.githubusercontent.com/44648612/223162006-a67d3647-ba94-4a68-a992-8320e71c650f.png" width="45%">
 </p>
 
 ## Usage
