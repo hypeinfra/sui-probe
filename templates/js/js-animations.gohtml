@@ -12,7 +12,7 @@
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
                     if (xhr.status === 200) {
-                        window.history.pushState(null, 'Node statistics', '/?sui-node-address=' + searchValue);
+                        window.history.pushState(null, 'Node statistics', '?sui-node-address=' + searchValue);
                         document.title = 'Node statistics - ' + searchValue;
                         document.write(xhr.responseText);
                     } else {
