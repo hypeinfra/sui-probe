@@ -194,6 +194,7 @@ func main() {
 			ProvidedNodeTPS := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
 			OfficialNodeTPS := officialNodeInfoWithSleep.Transactions - officialNodeInfo.Transactions
 			syncStatusInPercents := float64(providedNodeInfo.Transactions) / float64(officialNodeInfo.Transactions) * 100
+			CanProvidedNodeCatchUp := ProvidedNodeTPS >= OfficialNodeTPS && ProvidedNodeTPS != 0 && OfficialNodeTPS != 0 && syncStatusInPercents < 90
 			// If transactions amount is more than on official node, then something is wrong
 			syncTransactionsInvalid := providedNodeInfo.Transactions > officialNodeInfo.Transactions
 			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(ProvidedNodeTPS)) * time.Second
@@ -213,6 +214,7 @@ func main() {
 					"methodsAmountOfficial":       officialNodeInfo.MethodsAmount,
 					"NodeTPS":                     ProvidedNodeTPS,
 					"OfficialNodeTPS":             OfficialNodeTPS,
+					"CanProvidedNodeCatchUp":      CanProvidedNodeCatchUp,
 					"NodeOutdated":                isProvidedNodeOutdated,
 					"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
 					"NodeSyncTimeWait":            syncPredictedTimeWait,
@@ -233,6 +235,7 @@ func main() {
 				"methodsAmountOfficial":       officialNodeInfo.MethodsAmount,
 				"NodeTPS":                     ProvidedNodeTPS,
 				"OfficialNodeTPS":             OfficialNodeTPS,
+				"CanProvidedNodeCatchUp":      CanProvidedNodeCatchUp,
 				"NodeOutdated":                isProvidedNodeOutdated,
 				"NodeSyncStatus":              fmt.Sprintf("%.2f", syncStatusInPercents) + "%",
 				"NodeSyncTimeWait":            syncPredictedTimeWait,

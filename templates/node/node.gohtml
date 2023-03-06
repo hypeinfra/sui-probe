@@ -12,8 +12,14 @@
         <br>
         <p class="warning">Your node have more transactions than official node!</p>
     {{ end }}
+    {{ if not .CanProvidedNodeCatchUp }}
+        <br>
+        <p class="warning">Your node is syncing slower than the official node. If this continues for more than a day,
+            it might never catch up</p>
+    {{ end }}
     {{ if not .NodeSyncTransactionsInvalid }}
-        <p>Node sync speed: {{ .NodeTPS }} TPS | {{ .NodeSyncStatus }} {{ if not .NodeSyncZeroSpeedCheck }}| Around {{ .NodeSyncTimeWait }} for full sync. {{ end }}</p>
+        <p>Node sync speed: {{ .NodeTPS }} TPS
+            | {{ .NodeSyncStatus }} {{ if not .NodeSyncZeroSpeedCheck }}| Around {{ .NodeSyncTimeWait }} for full sync. {{ end }}</p>
     {{ else }}
         <p>Node sync speed: {{ .NodeTPS }} TPS</p>
     {{ end }}
