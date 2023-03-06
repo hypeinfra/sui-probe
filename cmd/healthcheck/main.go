@@ -194,7 +194,7 @@ func main() {
 			ProvidedNodeTPS := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
 			OfficialNodeTPS := officialNodeInfoWithSleep.Transactions - officialNodeInfo.Transactions
 			syncStatusInPercents := float64(providedNodeInfo.Transactions) / float64(officialNodeInfo.Transactions) * 100
-			CanProvidedNodeCatchUp := ProvidedNodeTPS >= OfficialNodeTPS && ProvidedNodeTPS != 0 && OfficialNodeTPS != 0 && syncStatusInPercents < 90
+			CanProvidedNodeCatchUp := (ProvidedNodeTPS >= OfficialNodeTPS || syncStatusInPercents > 95) && (ProvidedNodeTPS != 0 || OfficialNodeTPS != 0)
 			// If transactions amount is more than on official node, then something is wrong
 			syncTransactionsInvalid := providedNodeInfo.Transactions > officialNodeInfo.Transactions
 			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(ProvidedNodeTPS)) * time.Second
