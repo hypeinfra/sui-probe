@@ -42,7 +42,10 @@ footer ul li:has(strong) {
 }
 
 header {
-    padding: 1rem;
+    margin: 0 auto;
+    max-width: 650px;
+    padding-top: 1rem;
+    padding-left: 1rem;
 }
 
 /* Really basic CSS for older browsers */
@@ -77,6 +80,10 @@ main#node {
     margin: 0 auto;
     max-width: 650px;
     padding: 1rem;
+}
+
+main#node h1 {
+    margin: 0 0 1rem;
 }
 
 main#main-page form input {
