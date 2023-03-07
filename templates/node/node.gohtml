@@ -10,7 +10,8 @@
     {{ end }}
     {{ if .NodeSyncTransactionsInvalid }}
         <br>
-        <p class="warning">Your node have more transactions than official node!</p>
+        <p class="warning">Your node have more transactions than official node!
+            On devnet it may be possible due to upgrading to a new version, you may need to wipe your sui database and do a genesis update.</p>
     {{ end }}
     {{ if not .CanProvidedNodeCatchUp }}
         <br>
@@ -54,6 +55,7 @@
         </tr>
         </tbody>
     </table>
+    <p>Predicted database size: {{ .NodeDatabaseSize }}</p>
     <h2>Node performance</h2>
     {{ if .NoStats }}
         <p>No information available, do you have an open metrics port?</p>
