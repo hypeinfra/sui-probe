@@ -18,6 +18,18 @@
             </ul>
         </section>
     </section>
+    <section id="Upgrading_your_node_on_devnet">
+        <h2><a href="#Upgrading_your_node_on_devnet">Upgrading your node on devnet</a></h2>
+        <p>Usually upgrading requires updating genesis and wiping sui database.</p>
+        <p>Check <code>#devnet-updates</code> on Sui discord before completing next steps.</p>
+        <section>
+            <ul>
+                <li>Remove <strong>suidb</strong> and <strong>genesis.blob</strong></li>
+                <li>Download a new <strong>genesis</strong>: <code>curl -fLJO
+                        https://github.com/MystenLabs/sui-genesis/raw/main/devnet/genesis.blob</code></li>
+            </ul>
+        </section>
+    </section>
     <h2>Warnings explanation</h2>
     <section>
         <p class="warning">Official node have different version.</p>
@@ -29,7 +41,8 @@
     </section>
     <section>
         <p class="warning">Your node is not syncing, please check your node logs.</p>
-        <p>This means that your node is not synchronising with the network. Check your node logs for more information.</p>
+        <p>This means that your node is not synchronising with the network. Check your node logs for more
+            information.</p>
     </section>
     <section>
         <p class="warning">Your node have more transactions than official node!</p>
