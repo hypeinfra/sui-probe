@@ -6,6 +6,7 @@ import (
 	"github.com/hypeinfra/sui-probe/static"
 	"github.com/hypeinfra/sui-probe/sui"
 	"github.com/hypeinfra/sui-probe/templates"
+	"github.com/hypeinfra/sui-probe/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/sync/errgroup"
@@ -20,6 +21,9 @@ import (
 	"syscall"
 	"time"
 )
+
+// Magic number for calculating the transaction size
+const transactionSize = 0.00010382502180774038
 
 const HTMLNodeLoadHead = `<!DOCTYPE html>
 <html lang="en">
@@ -187,6 +191,7 @@ func main() {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
+			now := time.Now()
 			time.Sleep(3 * time.Second)
 
 			// Gather info after 3 seconds
@@ -195,6 +200,7 @@ func main() {
 
 			err = g.Wait()
 			stillWritingToStream <- true
+			sinceNow := time.Since(now)
 
 			// End of our HTML, so we can hide those dots
 			_, _ = c.Response().Write([]byte("</div>"))
@@ -205,8 +211,8 @@ func main() {
 				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
 			}
 
-			ProvidedNodeTPS := providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions
-			OfficialNodeTPS := officialNodeInfoWithSleep.Transactions - officialNodeInfo.Transactions
+			ProvidedNodeTPS := (providedNodeInfoWithSleep.Transactions - providedNodeInfo.Transactions) / uint(sinceNow.Seconds())
+			OfficialNodeTPS := (officialNodeInfoWithSleep.Transactions - officialNodeInfo.Transactions) / uint(sinceNow.Seconds())
 			syncStatusInPercents := float64(providedNodeInfo.Transactions) / float64(officialNodeInfo.Transactions) * 100
 			CanProvidedNodeCatchUp := (ProvidedNodeTPS >= OfficialNodeTPS || syncStatusInPercents > 95) && (ProvidedNodeTPS != 0 || OfficialNodeTPS != 0)
 			// If transactions amount is more than on official node, then something is wrong
