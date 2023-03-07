@@ -1,7 +1,7 @@
 {{ template "header" . }}
 <main id="node">
     <h1>Node statistics</h1>
-    {{ if not .NodeIsOutdated }}
+    {{ if not .NodeOutdated }}
         <p class="warning">Official node have different version.</p>
     {{ end }}
     {{ if .NodeSyncZeroSpeedCheck }}

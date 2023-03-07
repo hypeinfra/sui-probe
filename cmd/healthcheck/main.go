@@ -217,7 +217,7 @@ func main() {
 			// If transactions amount is more than on official node, then something is wrong
 			syncTransactionsInvalid := providedNodeInfo.Transactions > officialNodeInfo.Transactions
 			syncPredictedTimeWait := time.Duration(float64(officialNodeInfo.Transactions-providedNodeInfo.Transactions)/float64(ProvidedNodeTPS)) * time.Second
-			isProvidedNodeOutdated := officialNodeInfo.Version != providedNodeInfo.Version
+			isProvidedNodeOutdated := officialNodeInfo.Version == providedNodeInfo.Version
 			syncZeroSpeedCheck := ProvidedNodeTPS == 0 && providedNodeInfo.Transactions != officialNodeInfo.Transactions
 
 			if metricsNotAvailable {
