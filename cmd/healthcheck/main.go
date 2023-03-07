@@ -6,7 +6,6 @@ import (
 	"github.com/hypeinfra/sui-probe/static"
 	"github.com/hypeinfra/sui-probe/sui"
 	"github.com/hypeinfra/sui-probe/templates"
-	"github.com/hypeinfra/sui-probe/utils"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"golang.org/x/sync/errgroup"
