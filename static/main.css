@@ -134,6 +134,15 @@ main#main-page form input {
     }
 }
 
+/* Hype Infra logo */
+img.logo {
+    height: auto;
+    max-height: 200px;
+    width: 100%;
+    padding: 1rem;
+    margin: 1rem auto 0;
+}
+
 main#main-page form input {
     border: 1px solid #ced4da;
     box-shadow: 0 12px 30px 4px #e0e0e0;
