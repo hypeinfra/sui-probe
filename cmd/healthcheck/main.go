@@ -154,6 +154,10 @@ func main() {
 				}
 			}()
 
+			if err != nil {
+				return c.Render(http.StatusOK, "index.gohtml", map[string]any{"error": err.Error(), "ip": nodeIP})
+			}
+
 			g.Go(func() error {
 				_ = userNodeMetrics.GetMetrics()
 				uptime, _ := userNodeMetrics.GetUptime()
