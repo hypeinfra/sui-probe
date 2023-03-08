@@ -10,7 +10,9 @@
         <input type="submit" hidden />
     </form>
     {{ if .error }}
-        <p>An error occurred: {{ .error }}</p>
+        <p class="error">An error occurred: {{ .error }}</p>
+    {{ else }}
+        <p><a href="https://github.com/hypeinfra/sui-probe/">Here</a> are more details on how it works</p>
     {{ end }}
 </main>
 {{ template "footer" . }}
