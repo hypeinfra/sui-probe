@@ -44,9 +44,11 @@ footer {
         text-align: center;
         flex-direction: column;
     }
+
     footer ul {
         padding-left: 0;
     }
+
     body footer ul:last-of-type {
         padding-right: 0;
     }
@@ -126,14 +128,6 @@ main#main-page form input {
     border-radius: 6px;
 }
 
-/* Sometimes RGB isn't an option :( */
-@supports (rgb(0 0 0 / 5%)) {
-    main#main-page form input {
-        border: 1px solid #ced4da;
-        box-shadow: 0 12px 30px 4px rgb(0 0 0 / 5%);
-    }
-}
-
 /* Hype Infra logo */
 img.logo {
     height: auto;
@@ -145,7 +139,7 @@ img.logo {
 
 main#main-page form input {
     border: 1px solid #ced4da;
-    box-shadow: 0 12px 30px 4px #e0e0e0;
+    box-shadow: 0 12px 30px 4px rgb(0 0 0 / 15%);
 }
 
 main#main-page form + p {
@@ -158,6 +152,12 @@ main#main-page form + p.error {
     background: rgba(234, 70, 70, 0.44);
     border-radius: 6px;
     color: black;
+}
+
+@media (prefers-color-scheme: dark) {
+    main#main-page form + p.error {
+        color: white!important;
+    }
 }
 
 main#main-page form input:focus {
