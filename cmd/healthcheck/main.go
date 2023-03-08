@@ -142,8 +142,12 @@ func main() {
 				for {
 					select {
 					case <-t.C:
-						_, _ = c.Response().Write([]byte("."))
-						c.Response().Flush()
+						_, err = c.Response().Write([]byte("."))
+						if err != nil {
+							break outer
+						} else {
+							c.Response().Flush()
+						}
 					case <-stillWritingToStream:
 						break outer
 					}
