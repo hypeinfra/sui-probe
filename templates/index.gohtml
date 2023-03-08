@@ -3,7 +3,10 @@
 {{ template "head" . }}
 <body>
 <a href="https://hy.pe/infra">
-    <img src="static/logo/Infra Logo - Black.svg" class="logo" alt="Hype Infra Logo">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="static/logo/Infra%20Logo%20-%20White.svg" class="logo">
+        <img src="static/logo/Infra Logo - Black.svg" class="logo" alt="Hype Infra Logo">
+    </picture>
 </a>
 <main id="main-page">
     <h1>Sui Node Healthcheck</h1>
